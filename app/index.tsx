@@ -1,4 +1,5 @@
-import { Text, View } from "react-native";
+import { Link } from "expo-router";
+import { Text, TouchableOpacity, View } from "react-native";
 
 export default function Index() {
   return (
@@ -7,6 +8,12 @@ export default function Index() {
       <Text className="typo-body-md text-center">
         Design system wired up — Poppins + Lingua tokens.
       </Text>
+
+      <Link href="/onboarding" asChild>
+        <TouchableOpacity activeOpacity={0.85} className="mt-4 rounded-full bg-primary px-6 py-3">
+          <Text className="typo-h4 text-white">View Onboarding</Text>
+        </TouchableOpacity>
+      </Link>
     </View>
   );
 }
