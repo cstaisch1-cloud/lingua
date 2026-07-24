@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx expo *)",
+      "Bash(taskkill //F //IM node.exe //FI \"WINDOWTITLE eq *8083*\")",
+      "Bash(netstat -ano)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(npm view *)"
+    ]
+  }
+}
