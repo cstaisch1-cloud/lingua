@@ -6,7 +6,15 @@
       "Bash(netstat -ano)",
       "Bash(npx tsc *)",
       "Bash(npm run *)",
-      "Bash(npm view *)"
+      "Bash(npm view *)",
+      "Read(//c/Users/Administrator/Desktop/**)",
+      "Read(//c/Users/Administrator/**)",
+      "Bash(npm ls *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8090 --max-time 3)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8081 --max-time 3)",
+      "Bash(powershell -Command \"Get-Process -Id 11352,12472 | Select-Object Id,ProcessName,Path\" 2>&1)",
+      "Bash(curl -s http://localhost:8090 --max-time 3)",
+      "Bash(curl -s http://localhost:8081 --max-time 3)"
     ]
   }
 }

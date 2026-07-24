@@ -1,10 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { images } from "@/constants/images";
 
 export default function OnboardingScreen() {
+  const router = useRouter();
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View className="flex-1 px-6">
@@ -48,6 +51,7 @@ export default function OnboardingScreen() {
 
         <TouchableOpacity
           activeOpacity={0.85}
+          onPress={() => router.push("/sign-up")}
           className="mb-6 flex-row items-center justify-center rounded-full bg-primary py-[18px]"
           style={styles.buttonShadow}
         >
