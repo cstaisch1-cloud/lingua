@@ -14,6 +14,12 @@ export default function Index() {
           Signed in as {user.primaryEmailAddress?.emailAddress}
         </Text>
 
+        <Link href="/language-select" asChild>
+          <TouchableOpacity activeOpacity={0.85} className="mt-4 rounded-full bg-primary px-6 py-3">
+            <Text className="typo-h4 text-white">Choose a Language</Text>
+          </TouchableOpacity>
+        </Link>
+
         <TouchableOpacity
           activeOpacity={0.85}
           onPress={() => signOut()}
