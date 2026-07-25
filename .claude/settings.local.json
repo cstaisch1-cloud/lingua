@@ -14,7 +14,19 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8081 --max-time 3)",
       "Bash(powershell -Command \"Get-Process -Id 11352,12472 | Select-Object Id,ProcessName,Path\" 2>&1)",
       "Bash(curl -s http://localhost:8090 --max-time 3)",
-      "Bash(curl -s http://localhost:8081 --max-time 3)"
+      "Bash(curl -s http://localhost:8081 --max-time 3)",
+      "Bash(command -v clerk)",
+      "Bash(clerk --version)",
+      "Bash(npm install *)",
+      "Bash(clerk auth *)",
+      "Bash(clerk init *)",
+      "Skill(clerk-expo)",
+      "Bash(curl *)",
+      "Bash(node -e \"console.log\\(Object.keys\\(require\\('C:/Users/Administrator/Desktop/Apps/duolingo/node_modules/@clerk/expo/package.json'\\).exports\\)\\)\")",
+      "Bash(xargs grep -l \"useSignIn\\\\b\")",
+      "Bash(xargs grep -l \"declare function useSignIn\\\\|declare const useSignIn\")",
+      "Bash(git check-ignore *)",
+      "Bash(clerk doctor *)"
     ]
   }
 }

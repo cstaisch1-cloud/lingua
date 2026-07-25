@@ -1,7 +1,9 @@
+import { useSignIn, useSSO } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -22,8 +24,60 @@ import { colors } from "@/theme/colors";
 
 export default function SignInScreen() {
   const router = useRouter();
+  const { signIn, fetchStatus } = useSignIn();
+  const { startSSOFlow } = useSSO();
   const [email, setEmail] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  const isSubmitting = fetchStatus === "fetching";
+
+  const handleSignIn = async () => {
+    if (!email) {
+      return;
+    }
+
+    const { error } = await signIn.emailCode.sendCode({ emailAddress: email });
+    if (error) {
+      Alert.alert("Couldn't log in", error.longMessage ?? error.message);
+      return;
+    }
+
+    setIsVerifying(true);
+  };
+
+  const handleVerifyCode = async (code: string) => {
+    const { error } = await signIn.emailCode.verifyCode({ code });
+    if (error) {
+      return error.longMessage ?? error.message;
+    }
+
+    if (signIn.status === "complete") {
+      await signIn.finalize();
+      router.replace("/");
+    }
+
+    return null;
+  };
+
+  const handleGoogleSignIn = async () => {
+    if (isGoogleLoading) {
+      return;
+    }
+
+    setIsGoogleLoading(true);
+    try {
+      const { createdSessionId, setActive } = await startSSOFlow({ strategy: "oauth_google" });
+      if (createdSessionId && setActive) {
+        await setActive({ session: createdSessionId });
+        router.replace("/");
+      }
+    } catch (err) {
+      console.error("Google sign-in error:", JSON.stringify(err, null, 2));
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
@@ -63,11 +117,17 @@ export default function SignInScreen() {
             </View>
 
             <View className="mt-5">
-              <PrimaryGradientButton label="Log In" onPress={() => setIsVerifying(true)} />
+              <PrimaryGradientButton
+                label={isSubmitting ? "Logging in..." : "Log In"}
+                onPress={handleSignIn}
+              />
             </View>
 
             <View className="mt-5">
-              <SocialAuthButtons />
+              <SocialAuthButtons
+                onGooglePress={handleGoogleSignIn}
+                isGoogleLoading={isGoogleLoading}
+              />
             </View>
 
             <View className="mt-auto flex-row items-center justify-center gap-1 pt-6">
@@ -86,6 +146,7 @@ export default function SignInScreen() {
         visible={isVerifying}
         onClose={() => setIsVerifying(false)}
         email={email || "your email"}
+        onVerify={handleVerifyCode}
       />
     </SafeAreaView>
   );
