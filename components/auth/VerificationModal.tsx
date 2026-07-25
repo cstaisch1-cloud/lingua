@@ -1,4 +1,3 @@
-import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -14,18 +13,20 @@ import {
 import { colors } from "@/theme/colors";
 
 const CODE_LENGTH = 6;
-const AUTO_NAVIGATE_DELAY_MS = 300;
 
 type VerificationModalProps = {
   visible: boolean;
   onClose: () => void;
   email: string;
+  /** Verify the code with Clerk. Return an error message on failure, or null on success. */
+  onVerify: (code: string) => Promise<string | null>;
 };
 
-export function VerificationModal({ visible, onClose, email }: VerificationModalProps) {
+export function VerificationModal({ visible, onClose, email, onVerify }: VerificationModalProps) {
   const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
   const inputRef = useRef<TextInput>(null);
-  const router = useRouter();
 
   useEffect(() => {
     if (!visible) {
@@ -33,19 +34,27 @@ export function VerificationModal({ visible, onClose, email }: VerificationModal
     }
 
     setCode("");
+    setError(null);
     const focusTimer = setTimeout(() => inputRef.current?.focus(), 400);
     return () => clearTimeout(focusTimer);
   }, [visible]);
 
-  const handleChangeCode = (text: string) => {
+  const handleChangeCode = async (text: string) => {
     const digitsOnly = text.replace(/[^0-9]/g, "").slice(0, CODE_LENGTH);
     setCode(digitsOnly);
+    setError(null);
 
     if (digitsOnly.length === CODE_LENGTH) {
-      setTimeout(() => {
+      setIsVerifying(true);
+      const errorMessage = await onVerify(digitsOnly);
+      setIsVerifying(false);
+
+      if (errorMessage) {
+        setError(errorMessage);
+        setCode("");
+      } else {
         onClose();
-        router.replace("/");
-      }, AUTO_NAVIGATE_DELAY_MS);
+      }
     }
   };
 
@@ -86,11 +95,19 @@ export function VerificationModal({ visible, onClose, email }: VerificationModal
                 onChangeText={handleChangeCode}
                 keyboardType="number-pad"
                 maxLength={CODE_LENGTH}
+                editable={!isVerifying}
                 style={StyleSheet.absoluteFill}
                 className="opacity-0"
                 caretHidden
               />
             </View>
+
+            {isVerifying && (
+              <Text className="typo-body-sm mt-3 text-center text-ink-muted">Verifying…</Text>
+            )}
+            {error && (
+              <Text className="typo-body-sm mt-3 text-center text-red-500">{error}</Text>
+            )}
           </Pressable>
         </Pressable>
       </KeyboardAvoidingView>

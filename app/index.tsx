@@ -1,7 +1,30 @@
+import { useClerk, useUser } from "@clerk/expo";
 import { Link } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
 
 export default function Index() {
+  const { user } = useUser();
+  const { signOut } = useClerk();
+
+  if (user) {
+    return (
+      <View className="flex-1 items-center justify-center gap-2 bg-background px-6">
+        <Text className="typo-h1">lingua</Text>
+        <Text className="typo-body-md text-center">
+          Signed in as {user.primaryEmailAddress?.emailAddress}
+        </Text>
+
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => signOut()}
+          className="mt-4 rounded-full bg-primary px-6 py-3"
+        >
+          <Text className="typo-h4 text-white">Sign out</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1 items-center justify-center gap-2 bg-background px-6">
       <Text className="typo-h1">lingua</Text>

@@ -1,7 +1,9 @@
+import { useSignUp, useSSO } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -22,9 +24,62 @@ import { colors } from "@/theme/colors";
 
 export default function SignUpScreen() {
   const router = useRouter();
+  const { signUp, fetchStatus } = useSignUp();
+  const { startSSOFlow } = useSSO();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  const isSubmitting = fetchStatus === "fetching";
+
+  const handleSignUp = async () => {
+    if (!email || !password) {
+      return;
+    }
+
+    const { error } = await signUp.password({ emailAddress: email, password });
+    if (error) {
+      Alert.alert("Couldn't sign up", error.longMessage ?? error.message);
+      return;
+    }
+
+    await signUp.verifications.sendEmailCode();
+    setIsVerifying(true);
+  };
+
+  const handleVerifyCode = async (code: string) => {
+    const { error } = await signUp.verifications.verifyEmailCode({ code });
+    if (error) {
+      return error.longMessage ?? error.message;
+    }
+
+    if (signUp.status === "complete") {
+      await signUp.finalize();
+      router.replace("/");
+    }
+
+    return null;
+  };
+
+  const handleGoogleSignUp = async () => {
+    if (isGoogleLoading) {
+      return;
+    }
+
+    setIsGoogleLoading(true);
+    try {
+      const { createdSessionId, setActive } = await startSSOFlow({ strategy: "oauth_google" });
+      if (createdSessionId && setActive) {
+        await setActive({ session: createdSessionId });
+        router.replace("/");
+      }
+    } catch (err) {
+      console.error("Google sign-up error:", JSON.stringify(err, null, 2));
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
@@ -73,12 +128,20 @@ export default function SignUpScreen() {
             </View>
 
             <View className="mt-5">
-              <PrimaryGradientButton label="Sign Up" onPress={() => setIsVerifying(true)} />
+              <PrimaryGradientButton
+                label={isSubmitting ? "Signing up..." : "Sign Up"}
+                onPress={handleSignUp}
+              />
             </View>
 
             <View className="mt-5">
-              <SocialAuthButtons />
+              <SocialAuthButtons
+                onGooglePress={handleGoogleSignUp}
+                isGoogleLoading={isGoogleLoading}
+              />
             </View>
+
+            <View nativeID="clerk-captcha" />
 
             <View className="mt-auto flex-row items-center justify-center gap-1 pt-6">
               <Text className="typo-body-md text-ink-muted">Already have an account?</Text>
@@ -96,6 +159,7 @@ export default function SignUpScreen() {
         visible={isVerifying}
         onClose={() => setIsVerifying(false)}
         email={email || "your email"}
+        onVerify={handleVerifyCode}
       />
     </SafeAreaView>
   );
