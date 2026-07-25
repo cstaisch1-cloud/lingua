@@ -26,7 +26,10 @@
       "Bash(xargs grep -l \"useSignIn\\\\b\")",
       "Bash(xargs grep -l \"declare function useSignIn\\\\|declare const useSignIn\")",
       "Bash(git check-ignore *)",
-      "Bash(clerk doctor *)"
+      "Bash(clerk doctor *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(npx eslint *)",
+      "Bash(echo \"started with pid $!\")"
     ]
   }
 }

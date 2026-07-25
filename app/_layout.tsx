@@ -6,6 +6,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import { fontAssets } from "@/theme";
+import { useLanguageStore } from "@/store/language-store";
 
 import "../global.css";
 
@@ -25,6 +26,10 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
+    useLanguageStore.persist.rehydrate();
+  }, []);
 
   if (!fontsLoaded && !fontError) {
     return null;

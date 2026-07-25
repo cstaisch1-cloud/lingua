@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LanguageCard } from "@/components/LanguageCard";
 import { images } from "@/constants/images";
 import { PrimaryGradientButton } from "@/components/auth/PrimaryGradientButton";
+import { useLanguageStore } from "@/store/language-store";
 import { languages } from "@/data/languages";
 import { colors } from "@/theme/colors";
 import type { LanguageCode } from "@/types/learning";
@@ -14,7 +15,9 @@ import type { LanguageCode } from "@/types/learning";
 export default function LanguageSelectScreen() {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [selectedId, setSelectedId] = useState<LanguageCode>(languages[0].id);
+  const selectedLanguage = useLanguageStore((state) => state.selectedLanguage);
+  const setSelectedLanguage = useLanguageStore((state) => state.setSelectedLanguage);
+  const [selectedId, setSelectedId] = useState<LanguageCode>(selectedLanguage ?? languages[0].id);
 
   const filteredLanguages = languages.filter((language) => {
     const query = search.trim().toLowerCase();
@@ -66,7 +69,13 @@ export default function LanguageSelectScreen() {
           />
 
           <View className="mt-4">
-            <PrimaryGradientButton label="Confirm" onPress={() => router.replace("/")} />
+            <PrimaryGradientButton
+              label="Confirm"
+              onPress={() => {
+                setSelectedLanguage(selectedId);
+                router.replace("/");
+              }}
+            />
           </View>
         </View>
 
