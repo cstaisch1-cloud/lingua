@@ -8,6 +8,7 @@ import { PostHogProvider } from "posthog-react-native";
 
 import { fontAssets } from "@/theme";
 import { useLanguageStore } from "@/store/language-store";
+import { useProgressStore } from "@/store/progress-store";
 import { posthog } from "@/lib/posthog";
 
 import "../global.css";
@@ -34,6 +35,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     useLanguageStore.persist.rehydrate();
+    useProgressStore.persist.rehydrate();
   }, []);
 
   // Manual screen tracking for Expo Router
