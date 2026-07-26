@@ -46,6 +46,24 @@ export const units: Unit[] = [
     icon: "👋",
     color: "#58CC02",
   },
+  {
+    id: "ko-unit-1",
+    languageId: "ko",
+    order: 1,
+    title: "Basics 1",
+    description: "Greetings and simple everyday words.",
+    icon: "👋",
+    color: "#8D7CF7",
+  },
+  {
+    id: "zh-unit-1",
+    languageId: "zh",
+    order: 1,
+    title: "Basics 1",
+    description: "Greetings and simple everyday words.",
+    icon: "👋",
+    color: "#E2543F",
+  },
 ];
 
 export function getUnitsByLanguage(languageId: LanguageCode): Unit[] {
