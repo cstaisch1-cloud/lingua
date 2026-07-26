@@ -3,6 +3,7 @@ import { useUser } from "@clerk/expo";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { usePostHog } from "posthog-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { images } from "@/constants/images";
@@ -43,6 +44,7 @@ type PlanItem = {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const posthog = usePostHog();
   const { user } = useUser();
   const selectedLanguage = useLanguageStore((state) => state.selectedLanguage);
 
@@ -145,7 +147,14 @@ export default function HomeScreen() {
 
             <TouchableOpacity
               activeOpacity={0.85}
-              onPress={() => router.push("/(tabs)/learn")}
+              onPress={() => {
+                posthog.capture("lesson_continued", {
+                  language_id: selectedLanguage,
+                  unit_id: currentUnit?.id,
+                  lesson_id: currentLesson?.id,
+                });
+                router.push("/(tabs)/learn");
+              }}
               className="mt-4 self-start rounded-full bg-white px-6 py-2.5"
             >
               <Text className="typo-h4" style={{ color: colors.primary }}>
@@ -165,7 +174,15 @@ export default function HomeScreen() {
         <View className="gap-4">
           <View className="flex-row items-center justify-between">
             <Text className="typo-h3">Today&apos;s plan</Text>
-            <TouchableOpacity onPress={() => router.push("/(tabs)/learn")}>
+            <TouchableOpacity
+              onPress={() => {
+                posthog.capture("lesson_continued", {
+                  language_id: selectedLanguage,
+                  trigger: "view_all",
+                });
+                router.push("/(tabs)/learn");
+              }}
+            >
               <Text className="typo-h4" style={{ color: colors.primary }}>
                 View all
               </Text>
@@ -206,7 +223,10 @@ export default function HomeScreen() {
         {/* Next up */}
         <TouchableOpacity
           activeOpacity={0.9}
-          onPress={() => router.push("/(tabs)/ai-teacher")}
+          onPress={() => {
+            posthog.capture("ai_teacher_opened", { language_id: selectedLanguage });
+            router.push("/(tabs)/ai-teacher");
+          }}
           className="flex-row items-center justify-between rounded-3xl bg-[#EAF6E7] p-4"
           style={styles.cardShadow}
         >

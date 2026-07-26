@@ -29,7 +29,10 @@
       "Bash(clerk doctor *)",
       "Bash(echo \"EXIT:$?\")",
       "Bash(npx eslint *)",
-      "Bash(echo \"started with pid $!\")"
+      "Bash(echo \"started with pid $!\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
