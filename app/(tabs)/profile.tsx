@@ -1,16 +1,24 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useClerk } from "@clerk/expo";
 import { Text, TouchableOpacity, View } from "react-native";
+import { usePostHog } from "posthog-react-native";
 
 import { useLanguageStore } from "@/store/language-store";
 
 export default function ProfileScreen() {
   const { signOut } = useClerk();
+  const posthog = usePostHog();
   const setSelectedLanguage = useLanguageStore((state) => state.setSelectedLanguage);
 
   const handleClearStorage = async () => {
     await AsyncStorage.clear();
     setSelectedLanguage(null);
+  };
+
+  const handleSignOut = () => {
+    posthog.capture("user_signed_out");
+    posthog.reset();
+    signOut();
   };
 
   return (
@@ -19,7 +27,7 @@ export default function ProfileScreen() {
 
       <TouchableOpacity
         activeOpacity={0.85}
-        onPress={() => signOut()}
+        onPress={handleSignOut}
         className="mt-4 rounded-full bg-primary px-6 py-3"
       >
         <Text className="typo-h4 text-white">Sign out</Text>

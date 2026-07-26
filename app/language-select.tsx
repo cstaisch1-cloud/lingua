@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { usePostHog } from "posthog-react-native";
 import { FlatList, Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -14,6 +15,7 @@ import type { LanguageCode } from "@/types/learning";
 
 export default function LanguageSelectScreen() {
   const router = useRouter();
+  const posthog = usePostHog();
   const [search, setSearch] = useState("");
   const selectedLanguage = useLanguageStore((state) => state.selectedLanguage);
   const setSelectedLanguage = useLanguageStore((state) => state.setSelectedLanguage);
@@ -72,6 +74,10 @@ export default function LanguageSelectScreen() {
             <PrimaryGradientButton
               label="Confirm"
               onPress={() => {
+                posthog.capture("language_selected", {
+                  language_id: selectedId,
+                  previous_language: selectedLanguage ?? null,
+                });
                 setSelectedLanguage(selectedId);
                 router.replace("/");
               }}

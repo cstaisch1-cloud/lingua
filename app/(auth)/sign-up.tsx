@@ -2,6 +2,7 @@ import { useSignUp, useSSO } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
+import { usePostHog } from "posthog-react-native";
 import {
   Alert,
   Image,
@@ -26,6 +27,7 @@ export default function SignUpScreen() {
   const router = useRouter();
   const { signUp, fetchStatus } = useSignUp();
   const { startSSOFlow } = useSSO();
+  const posthog = usePostHog();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -55,6 +57,12 @@ export default function SignUpScreen() {
     }
 
     if (signUp.status === "complete") {
+      const userId = signUp.createdUserId ?? email;
+      posthog.identify(userId, {
+        $set: { email },
+        $set_once: { first_signup_date: new Date().toISOString() },
+      });
+      posthog.capture("user_signed_up", { method: "email_password" });
       await signUp.finalize();
       router.replace("/");
     }
@@ -72,6 +80,7 @@ export default function SignUpScreen() {
       const { createdSessionId, setActive } = await startSSOFlow({ strategy: "oauth_google" });
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId });
+        posthog.capture("user_signed_up", { method: "google_sso" });
         router.replace("/");
       }
     } catch (err) {
